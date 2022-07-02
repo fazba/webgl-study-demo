@@ -1,5 +1,5 @@
 import { mat4 } from "gl-matrix";
-import imgPath from '@/assets/img/container2_specular.png'
+import imgPath from '../container2_specular.png'
 
 export const vertexstring = `
 attribute vec4 a_position;
@@ -27,6 +27,12 @@ void main(void){
 let angle = 45;
 let uniformTexture: WebGLUniformLocation
 let texture: WebGLTexture
+let moveState = false;
+let mouseDownX = 0;
+let mouseDownY = 0;
+let offsetX = 0;
+let offsetY = 0;
+let wheelMove = 0;
 
 export function initBuffer(webgl: WebGLRenderingContext) {
 
@@ -102,17 +108,33 @@ export function initBuffer(webgl: WebGLRenderingContext) {
 
   let uniformMatrix1 = webgl.getUniformLocation(webgl.program, "u_formMatrix");
 
-  let ModelMatrix = mat4.create();
-  mat4.identity(ModelMatrix);
-  mat4.translate(ModelMatrix, ModelMatrix, [0, 0, 0]);
+  let ModelMatrixx = mat4.create();
+  mat4.identity(ModelMatrixx);
+  mat4.rotate(ModelMatrixx, ModelMatrixx, offsetX * Math.PI / 180, [0, 1, 0]);
+
+  let ModelMatrixy = mat4.create();
+  mat4.identity(ModelMatrixy);
+  mat4.rotate(ModelMatrixy, ModelMatrixy, offsetY * Math.PI / 180, [1, 0, 0]);
+
+  let ModelMatrixxy = mat4.create();
+  mat4.identity(ModelMatrixxy);
+  mat4.multiply(ModelMatrixxy, ModelMatrixx, ModelMatrixy);
+
+  let ModelMatrixWheel = mat4.create();
+  mat4.identity(ModelMatrixWheel);
+  console.log(wheelMove);
+  mat4.translate(ModelMatrixWheel, ModelMatrixWheel, [0, 0, wheelMove]);
+  mat4.multiply(ModelMatrixWheel, ModelMatrixWheel, ModelMatrixxy);
+
+
 
   let ViewMatrix = mat4.create();
   mat4.identity(ViewMatrix);
-  mat4.lookAt(ViewMatrix, [5, 5, 5], [0, 0, 0], [0, 1, 0]);
+  mat4.lookAt(ViewMatrix, [0, 0, 10], [0, 0, 0], [0, 1, 0]);
 
   let mvMatrix = mat4.create();
   mat4.identity(mvMatrix);
-  mat4.multiply(mvMatrix, ViewMatrix, ModelMatrix);
+  mat4.multiply(mvMatrix, ViewMatrix, ModelMatrixWheel);
 
   let mvpMatrix = mat4.create();
   mat4.identity(mvpMatrix);
@@ -122,9 +144,6 @@ export function initBuffer(webgl: WebGLRenderingContext) {
   uniformTexture = webgl.getUniformLocation(webgl.program, "texture")!;
 
   texture = initTexture(webgl, imgPath);
-
-
-
 }
 
 function initTexture(webgl: WebGLRenderingContext, imageFile: string) {
@@ -152,7 +171,6 @@ function handleLoadedTexture(webgl: WebGLRenderingContext, texture: WebGLTexture
   /**纹理垂直填充方式 */
   webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_WRAP_T, webgl.CLAMP_TO_EDGE);
 
-  debugger
   webgl.clearColor(0, 0, 0, 1);
   webgl.clear(webgl.COLOR_BUFFER_BIT | webgl.DEPTH_BUFFER_BIT);
   webgl.enable(webgl.DEPTH_TEST);
@@ -160,4 +178,36 @@ function handleLoadedTexture(webgl: WebGLRenderingContext, texture: WebGLTexture
   webgl.bindTexture(webgl.TEXTURE_2D, texture);
   webgl.uniform1i(uniformTexture, 0);
   webgl.drawArrays(webgl.TRIANGLES, 0, 36);
+}
+export function initEvent(webgl: WebGLRenderingContext) {
+  document.onmousedown = mouseDown;
+  document.onmouseup = mouseUp;
+  document.onmousemove = mouseMove(webgl);
+  document.onwheel = mouseWheel(webgl);
+}
+function mouseDown(e: MouseEvent) {
+  moveState = true;
+
+  mouseDownX = e.clientX;
+  mouseDownY = e.clientY;
+}
+function mouseUp(e: MouseEvent) {
+  moveState = false;
+}
+function mouseMove(webgl: WebGLRenderingContext) {
+  return (e: MouseEvent) => {
+    if (!moveState) {
+      return
+    } else {
+      offsetX = e.clientX - mouseDownX;
+      offsetY = e.clientY - mouseDownY;
+    }
+    initBuffer(webgl);
+  }
+}
+function mouseWheel(webgl: WebGLRenderingContext) {
+  return (e: WheelEvent) => {
+    wheelMove -= e.deltaY / 100
+    initBuffer(webgl);
+  }
 }

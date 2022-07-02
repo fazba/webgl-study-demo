@@ -33,7 +33,7 @@ const routes: RouteRecordRaw[] = [
     /**中级教程 */
     path: '/middle',
     component: () => import('@/pages/middle/index.vue'),
-    redirect: '/middle/cube',
+    redirect: '/middle/light',
     children: [
       {
         /**平移、旋转、缩放 */
@@ -59,6 +59,11 @@ const routes: RouteRecordRaw[] = [
         /**绘制正方体 */
         path: 'cube',
         component: () => import('@/components/cube/index.vue'),
+      },
+      {
+        /**光照 */
+        path: 'light',
+        component: () => import('@/components/light/index.vue'),
       },
     ]
   },

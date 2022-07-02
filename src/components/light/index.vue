@@ -5,15 +5,8 @@
 import { onMounted } from 'vue';
 import { initWebgl } from './initWebgl'
 import { initShader } from './initShader';
-/**绘制正方体 */
+/**平行光 */
 // import { vertexstring, fragmentstring, initBuffer } from './modules/cube1'
-/**绘制包含颜色的的正方体 */
-// import { vertexstring, fragmentstring, initBuffer } from './modules/cube2'
-/**绘制有纹理的正方体 */
-// import { vertexstring, fragmentstring, initBuffer } from './modules/cube3'
-/**让正方体动起来 */
-import { vertexstring, fragmentstring, initBuffer, initEvent } from './modules/liveCube'
-
 
 
 
