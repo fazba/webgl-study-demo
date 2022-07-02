@@ -33,7 +33,7 @@ const routes: RouteRecordRaw[] = [
     /**中级教程 */
     path: '/middle',
     component: () => import('@/pages/middle/index.vue'),
-    redirect: '/middle/camera',
+    redirect: '/middle/cube',
     children: [
       {
         /**平移、旋转、缩放 */
@@ -44,6 +44,21 @@ const routes: RouteRecordRaw[] = [
         /**视点、视线 */
         path: 'camera',
         component: () => import('@/components/camera/index.vue'),
+      },
+      {
+        /**可视域、投影矩阵 */
+        path: 'visibility',
+        component: () => import('@/components/visibility/index.vue'),
+      },
+      {
+        /**深度缓冲区 */
+        path: 'Z-buffer',
+        component: () => import('@/components/Z-buffer/index.vue'),
+      },
+      {
+        /**绘制正方体 */
+        path: 'cube',
+        component: () => import('@/components/cube/index.vue'),
       },
     ]
   },
