@@ -6,7 +6,9 @@ import { onMounted } from 'vue';
 import { initWebgl } from './initWebgl'
 import { initShader } from './initShader';
 /**平行光 */
-// import { vertexstring, fragmentstring, initBuffer } from './modules/cube1'
+import { vertexstring, fragmentstring, initBuffer } from './modules/parallel'
+/**平行光 */
+// import { vertexstring, fragmentstring, initBuffer } from './modules/point'
 
 
 
@@ -14,8 +16,6 @@ onMounted(() => {
   const webgl = initWebgl()
   initShader(webgl, vertexstring, fragmentstring)
   initBuffer(webgl)
-  //鼠标事件
-  initEvent(webgl)
 })
 
 </script>

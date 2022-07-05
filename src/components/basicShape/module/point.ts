@@ -1,7 +1,8 @@
+import { mat4 } from "gl-matrix";
 
 
 //顶点着色器
-const vertexstring = `
+export const vertexstring = `
   attribute vec4 a_position;
   uniform   mat4 proj;
   void main(void){
@@ -10,7 +11,7 @@ const vertexstring = `
   }
 `;
 //片元着色器
-const fragmentstring = `
+export const fragmentstring = `
   void main(void){
     gl_FragColor = vec4(0,0,1.0,1.0);
   }
@@ -19,7 +20,7 @@ const fragmentstring = `
 
 
 //数据缓冲区
-function initBuffer(webgl, projMat4) {
+export function initBuffer(webgl: WebGLRenderingContext) {
   /**定义点的坐标： x, y, z, 1.0 */
   const pointPosition = new Float32Array([100.0, 100.0, 0.0, 1.0]);
   /**获取shader里定义的变量 */
@@ -29,18 +30,16 @@ function initBuffer(webgl, projMat4) {
   /**获取shader里定义的变量 */
   const uniformProj = webgl.getUniformLocation(webgl.program, "proj");
   /**给该变量赋值 */
+  let projMat4 = mat4.create();
+  mat4.identity(projMat4);
   webgl.uniformMatrix4fv(uniformProj, false, projMat4);
 }
 //绘制
-function draw(webgl) {
+export function draw(webgl: WebGLRenderingContext) {
   //刷颜色
   webgl.clearColor(0.0, 0.0, 0.0, 0.5);
   //
   webgl.clear(webgl.COLOR_BUFFER_BIT | webgl.DEPTH_BUFFER_BIT);
   // 绘制是点 ，从数组第几个开始， 绘制几个
   webgl.drawArrays(webgl.POINTS, 0, 1);
-}
-
-export {
-  initBuffer, draw, vertexstring, fragmentstring
 }

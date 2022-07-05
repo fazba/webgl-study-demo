@@ -4,13 +4,13 @@ import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router"
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    redirect: '/middle'
+    redirect: '/middle/light'
   },
   {
     /**初级教程 */
     path: '/primary',
     component: () => import('@/pages/primary/index.vue'),
-    redirect: '/primary/texture',
+    redirect: '/primary/basicShape',
     children: [
       {
         /**基础图形 */
