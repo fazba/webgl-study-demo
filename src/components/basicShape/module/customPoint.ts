@@ -38,7 +38,7 @@ export function initBuffer(webgl: WebGLRenderingContext, program: WebGLProgram) 
     const rgb = [Math.abs(pointx), Math.abs(pointy), Math.random()]
     colors.push(...rgb)
     /**
-     * 位置buffer
+     * 顶点buffer
      */
     const pointPosition = new Float32Array(points);
     const pointBuffer = webgl.createBuffer();

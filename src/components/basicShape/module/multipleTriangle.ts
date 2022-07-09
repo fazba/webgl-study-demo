@@ -1,6 +1,7 @@
+import { mat4 } from "gl-matrix";
 
 
-let vertexstring = `
+export const vertexstring = `
     attribute vec3 a_position;
     uniform  mat4  proj;
     void main(void){
@@ -8,13 +9,13 @@ let vertexstring = `
         gl_PointSize=60.0;
     }
     `;
-let fragmentstring = `
+export const fragmentstring = `
     precision mediump float;
     void main(void){
       gl_FragColor = vec4(0.0,0.0,1.0,1.0);
     }
     `;
-function initBuffer(webgl: WebGLRenderingContext, program: WebGLProgram) {
+export function initBuffer(webgl: WebGLRenderingContext, program: WebGLProgram) {
 
   const aPsotion = webgl.getAttribLocation(program, "a_position");
   //索引数组
@@ -42,10 +43,13 @@ function initBuffer(webgl: WebGLRenderingContext, program: WebGLProgram) {
   const indexBuffer = webgl.createBuffer()
   webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, indexBuffer)
   webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, indexArr, webgl.STATIC_DRAW)
+  /**uniform  mat4  proj */
   const uniformProj = webgl.getUniformLocation(program, "proj");
+  const projMat4 = mat4.create();
+  mat4.identity(projMat4);
   webgl.uniformMatrix4fv(uniformProj, false, projMat4);
 }
-function draw(webgl: WebGLRenderingContext) {
+export function draw(webgl: WebGLRenderingContext) {
   webgl.clearColor(0.0, 0.0, 0.0, 1.0);
   webgl.clear(webgl.COLOR_BUFFER_BIT | webgl.DEPTH_BUFFER_BIT);
   /**
@@ -56,8 +60,4 @@ function draw(webgl: WebGLRenderingContext) {
  * */
   //绘制模式，顶点个数，索引值数据类型,从第0个开始
   webgl.drawElements(webgl.TRIANGLES, 6, webgl.UNSIGNED_SHORT, 0);
-}
-
-export {
-  initBuffer, draw, vertexstring, fragmentstring
 }

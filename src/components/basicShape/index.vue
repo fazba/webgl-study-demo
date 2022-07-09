@@ -11,16 +11,14 @@ import { initWebgl } from './initWebgl'
 //绘制动态点并根据详细自定义颜色
 // import { initBuffer, draw, vertexstring, fragmentstring } from './module/customPoint'
 
-//绘制线、三角形
-import { initBuffer, draw, vertexstring, fragmentstring } from './module/line'
+//drawArrays绘制线、三角形
+// import { initBuffer, draw, vertexstring, fragmentstring } from './module/line'
 
-//绘制多个三角形
+//drawElements绘制多个三角形
 // import { initBuffer, draw, vertexstring, fragmentstring } from './module/multipleTriangle'
-//绘制多边形
-// import { initBuffer, draw, vertexstring, fragmentstring } from './module/polygon.js'
 
 //旋转
-// import { initBuffer, draw, vertexstring, fragmentstring } from './module/rotate'
+import { initBuffer, draw, vertexstring, fragmentstring } from './module/rotate'
 
 
 
