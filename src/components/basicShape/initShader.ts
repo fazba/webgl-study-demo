@@ -1,7 +1,8 @@
 export function initShader(webgl: WebGLRenderingContext, vertexstring: string, fragmentstring: string) {
+  //创建shader对象
   const vsshader = webgl.createShader(webgl.VERTEX_SHADER)!;
   const fsshader = webgl.createShader(webgl.FRAGMENT_SHADER)!;
-  // 绑定shader容器
+  // 将glsl代码写入shader对象
   webgl.shaderSource(vsshader, vertexstring);
   webgl.shaderSource(fsshader, fragmentstring);
   // 编译
@@ -11,9 +12,12 @@ export function initShader(webgl: WebGLRenderingContext, vertexstring: string, f
    * 方便js查看调试信息
    *
    * getShaderParameter  获取shader的状态
-   * webgl.COMPILE_STATUS 编译的状态
+   * webgl.COMPILE_STATUS ：表示着色器是否编译成功，是(GL_TRUE)不是(GL_FALSE)
+   * webgl.DELETE_STATUS ：表示着色器是否被删除，是(GL_TRUE)不是(GL_FALSE)
+   * webgl.SHADER_TYPE ：表示着色器类型
    * */
   if (!webgl.getShaderParameter(vsshader, webgl.COMPILE_STATUS)) {
+    //验证glsl字符串是否有问题
     const err = webgl.getShaderInfoLog(vsshader)
     alert(err)
     return
@@ -49,5 +53,5 @@ export function initShader(webgl: WebGLRenderingContext, vertexstring: string, f
   //使用
   webgl.useProgram(program);
 
-  webgl.program = program
+  return program
 }

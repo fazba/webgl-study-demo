@@ -14,9 +14,9 @@ let fragmentstring = `
       gl_FragColor = vec4(0.0,0.0,1.0,1.0);
     }
     `;
-function initBuffer(webgl: WebGLRenderingContext, projMat4: any) {
+function initBuffer(webgl: WebGLRenderingContext, program: WebGLProgram) {
 
-  const aPsotion = webgl.getAttribLocation(webgl.program, "a_position");
+  const aPsotion = webgl.getAttribLocation(program, "a_position");
   //索引数组
   const arrindex = [
     0, 1, 2,
@@ -42,7 +42,7 @@ function initBuffer(webgl: WebGLRenderingContext, projMat4: any) {
   const indexBuffer = webgl.createBuffer()
   webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, indexBuffer)
   webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, indexArr, webgl.STATIC_DRAW)
-  const uniformProj = webgl.getUniformLocation(webgl.program, "proj");
+  const uniformProj = webgl.getUniformLocation(program, "proj");
   webgl.uniformMatrix4fv(uniformProj, false, projMat4);
 }
 function draw(webgl: WebGLRenderingContext) {
@@ -50,11 +50,11 @@ function draw(webgl: WebGLRenderingContext) {
   webgl.clear(webgl.COLOR_BUFFER_BIT | webgl.DEPTH_BUFFER_BIT);
   /**
  * drawElements和drawArrays区别
- * drawElements的优点：drawArray画一个三角形就需要存入3个点，当量大的时候内存有问题
+ * drawArray缺点：画一个三角形就需要存入3个点，当量大的时候内存有问题
  * drawElements特有的索引缓冲区：通过点的复用，来绘制多边形
  *
  * */
-  //形状，几个点，无符号short,从第0个开始
+  //绘制模式，顶点个数，索引值数据类型,从第0个开始
   webgl.drawElements(webgl.TRIANGLES, 6, webgl.UNSIGNED_SHORT, 0);
 }
 

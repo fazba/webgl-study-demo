@@ -1,4 +1,4 @@
-export function initBuffer(webgl: WebGLRenderingContext, projMat4: any) {
+export function initBuffer(webgl: WebGLRenderingContext, program: WebGLProgram) {
   const arr = [
     0.100, 0.400, 0,
     0.100, 0.500, 0,
@@ -7,16 +7,16 @@ export function initBuffer(webgl: WebGLRenderingContext, projMat4: any) {
   const bufferArr = webgl.createBuffer()
   webgl.bindBuffer(webgl.ARRAY_BUFFER, bufferArr)
   webgl.bufferData(webgl.ARRAY_BUFFER, floatArr, webgl.STATIC_DRAW);
-  const a_position = webgl.getAttribLocation(webgl.program, "a_position");
+  const a_position = webgl.getAttribLocation(program, "a_position");
   webgl.enableVertexAttribArray(a_position);
   webgl.vertexAttribPointer(a_position, 3, webgl.FLOAT, false, 3 * 4, 0);
   /**
    *
    */
-  const u_proj = webgl.getUniformLocation(webgl.program, "proj");
+  const u_proj = webgl.getUniformLocation(program, "proj");
   webgl.uniformMatrix4fv(u_proj, false, projMat4);
 
-  const u_angle = webgl.getUniformLocation(webgl.program, "angle");
+  const u_angle = webgl.getUniformLocation(program, "angle");
   /**
    * 第二个参数：转过的弧度
    */
