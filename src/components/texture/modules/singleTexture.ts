@@ -1,8 +1,9 @@
 import { onMounted } from 'vue';
-import { vec3, mat4, quat4 } from '@/utils/glMatrix-0.9.6.min.js'
 import { initShader } from '../initShader'
 import { initWebgl } from '../initWebgl'
+// import imgUrl from '../img/point64.jpg'
 import imgUrl from '../img/point64.png'
+import { canvasNormalizing } from '@/utils/coordinateTrans'
 
 export default function () {
 
@@ -26,25 +27,20 @@ export default function () {
     gl_FragColor = color;
   }
 `;
-  const projMat4 = mat4.create();
-  /**纹理变量 */
-  let uniformTexture: any;
-  let textureHandle: any;
-  function initBuffer(webgl: WebGLRenderingContext, projMat4: any) {
-    const pointPosition = new Float32Array([100.0, 100.0, 0.0, 1.0, 100.0, 200.0, 0.0, 1.0, 200.0, 200.0, 0.0, 1.0]);
-    const aPsotion = webgl.getAttribLocation(webgl.program, "a_position");
+  function initBuffer(webgl: WebGLRenderingContext, program: WebGLProgram) {
+    const pointPosition = new Float32Array([
+      100.0, 100.0, 0.0, 1.0,
+      100.0, 200.0, 0.0, 1.0,
+      200.0, 200.0, 0.0, 1.0
+    ]);
+    const aPsotion = webgl.getAttribLocation(program, "a_position");
     const triangleBuffer = webgl.createBuffer();
     webgl.bindBuffer(webgl.ARRAY_BUFFER, triangleBuffer);
     webgl.bufferData(webgl.ARRAY_BUFFER, pointPosition, webgl.STATIC_DRAW);
     webgl.enableVertexAttribArray(aPsotion);
     webgl.vertexAttribPointer(aPsotion, 4, webgl.FLOAT, false, 16, 0);
-    const uniformProj = webgl.getUniformLocation(webgl.program, "proj");
-    webgl.uniformMatrix4fv(uniformProj, false, projMat4);
-    /**
-     * 纹理制作
-     */
-    uniformTexture = webgl.getUniformLocation(webgl.program, "texture");
-
+    /**uniform sampler2D texture */
+    const uniformTexture = webgl.getUniformLocation(program, "texture")!;
     /**开启混合 */
     webgl.enable(webgl.BLEND);
     /**
@@ -54,13 +50,24 @@ export default function () {
      *  */
     webgl.blendFunc(webgl.SRC_ALPHA, webgl.ONE_MINUS_SRC_ALPHA);
     console.log(imgUrl)
-    initTexture(webgl, imgUrl);
+    /**
+     * 初始化纹理
+     */
+    initTexture(webgl, imgUrl, uniformTexture);
 
 
   }
-  function handleLoadedTexture(webgl: WebGLRenderingContext, texture: WebGLTexture) {
+  function initTexture(webgl: WebGLRenderingContext, imageFile: string, uniformTexture: WebGLUniformLocation) {
+    const image = new Image();
+    image.onload = function () {
+      handleLoadedTexture(webgl, image, uniformTexture)
+    }
+    image.src = imageFile;
+  }
+  function handleLoadedTexture(webgl: WebGLRenderingContext, image: HTMLImageElement, uniformTexture: WebGLUniformLocation) {
+    const texture = webgl.createTexture()!;
     webgl.bindTexture(webgl.TEXTURE_2D, texture);
-    webgl.texImage2D(webgl.TEXTURE_2D, 0, webgl.RGBA, webgl.RGBA, webgl.UNSIGNED_BYTE, texture.image);
+    webgl.texImage2D(webgl.TEXTURE_2D, 0, webgl.RGBA, webgl.RGBA, webgl.UNSIGNED_BYTE, image);
     webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MAG_FILTER, webgl.NEAREST);
     webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MIN_FILTER, webgl.NEAREST);
     webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_WRAP_S, webgl.REPEAT);
@@ -70,14 +77,6 @@ export default function () {
     draw(webgl);
     // webgl.bindTexture(webgl.TEXTURE_2D, null);
   }
-  function initTexture(webgl: WebGLRenderingContext, imageFile: string) {
-    textureHandle = webgl.createTexture();
-    textureHandle.image = new Image();
-    textureHandle.image.onload = function () {
-      handleLoadedTexture(webgl, textureHandle)
-    }
-    textureHandle.image.src = imageFile;
-  }
   function draw(webgl: WebGLRenderingContext) {
     webgl.clearColor(0.3, 0.5, 0.3, 1.0);
     webgl.clear(webgl.COLOR_BUFFER_BIT | webgl.DEPTH_BUFFER_BIT);
@@ -85,9 +84,11 @@ export default function () {
     webgl.drawArrays(webgl.POINTS, 0, 3);
   }
   onMounted(() => {
-    const webgl = initWebgl(mat4, projMat4)
-    initShader(webgl, vertexstring, fragmentstring)
-    initBuffer(webgl, projMat4)
+    const webgl = initWebgl()
+    const program = initShader(webgl, vertexstring, fragmentstring)!
+    /**将canvas坐标归一化为webgl坐标 */
+    canvasNormalizing(webgl, program, "proj")
+    initBuffer(webgl, program)
     draw(webgl)
   })
 }

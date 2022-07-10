@@ -49,5 +49,5 @@ export function initShader(webgl: WebGLRenderingContext, vertexstring: string, f
   //使用
   webgl.useProgram(program);
 
-  webgl.program = program
+  return program
 }

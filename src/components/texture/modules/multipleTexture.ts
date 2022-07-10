@@ -1,9 +1,9 @@
 import { onMounted } from 'vue';
-import { vec3, mat4, quat4 } from '@/utils/glMatrix-0.9.6.min.js'
 import { initShader } from '../initShader'
 import { initWebgl } from '../initWebgl'
 import fogUrl from '../img/fog.png'
 import imgUrl from "../img/山水图像纹理映射.png"
+
 
 export default function () {
 
@@ -18,6 +18,7 @@ export default function () {
   varying vec2 inUV;
   void main(void){
       gl_Position =  a_position;
+      // gl_Position =  proj*a_position;
       inUV = outUV;
   }
   `;
@@ -34,7 +35,6 @@ export default function () {
     gl_FragColor = color1 + color2 ;
   }
   `;
-  const projMat4 = mat4.create();
   /**纹理变量 */
   let uniformTexture: WebGLUniformLocation
   let uniformTexture1: WebGLUniformLocation
@@ -43,30 +43,22 @@ export default function () {
   let texture0: WebGLTexture;
   let texture1: WebGLTexture;
   function webglStart() {
-    const webgl = init();
-    tick(webgl);
+    const { webgl, program } = init();
+    tick(webgl, program);
   }
-  const requestAnimFrame: any = (function () {
-    return window.requestAnimationFrame ||
-      window.webkitRequestAnimationFrame ||
-      window.mozRequestAnimationFrame ||
-      window.oRequestAnimationFrame ||
-      window.msRequestAnimationFrame ||
-      function (callback, element) {
-        window.setTimeout(callback, 1000 / 60);
-      };
-  })();
-  function tick(webgl: WebGLRenderingContext) {
-    requestAnimFrame(() => tick(webgl))
-    draw(webgl);
+  function tick(webgl: WebGLRenderingContext, program: WebGLProgram) {
+    requestAnimationFrame(() => tick(webgl, program))
+    draw(webgl, program);
   };
   function init() {
-    const webgl = initWebgl(mat4, projMat4);
-    initShader(webgl, vertexstring, fragmentstring);
-    initBuffer(webgl, projMat4);
-    return webgl
+    const webgl = initWebgl();
+    const program = initShader(webgl, vertexstring, fragmentstring)!
+    initBuffer(webgl, program);
+    return {
+      webgl, program
+    }
   }
-  function initBuffer(webgl: WebGLRenderingContext, projMat4: any) {
+  function initBuffer(webgl: WebGLRenderingContext, program: WebGLProgram) {
     /**
      * 2个三角形绘制成一个正方形
      *
@@ -91,28 +83,29 @@ export default function () {
       2, 0, 3
     ];
     const pointPosition = new Float32Array(arr);
-    const aPsotion = webgl.getAttribLocation(webgl.program, "a_position");
+    const aPsotion = webgl.getAttribLocation(program, "a_position");
     const triangleBuffer = webgl.createBuffer();
     webgl.bindBuffer(webgl.ARRAY_BUFFER, triangleBuffer);
     webgl.bufferData(webgl.ARRAY_BUFFER, pointPosition, webgl.STATIC_DRAW);
     webgl.enableVertexAttribArray(aPsotion);
     webgl.vertexAttribPointer(aPsotion, 4, webgl.FLOAT, false, 6 * 4, 0);
 
-    let uniformProj = webgl.getUniformLocation(webgl.program, "proj");
-    webgl.uniformMatrix4fv(uniformProj, false, projMat4);
-
-    const attribOutUV = webgl.getAttribLocation(webgl.program, "outUV");
+    /**生成将canvas尺寸归一化的矩阵 */
+    // const uniformProj = webgl.getUniformLocation(program, "proj")!;
+    // setOrthoMat4(webgl, uniformProj)
+    //
+    const attribOutUV = webgl.getAttribLocation(program, "outUV");
     webgl.enableVertexAttribArray(attribOutUV);
     webgl.vertexAttribPointer(attribOutUV, 2, webgl.FLOAT, false, 6 * 4, 4 * 4);
 
-    let indexarr = new Uint8Array(index)
-    let indexBuffer = webgl.createBuffer();
+    const indexarr = new Uint8Array(index)
+    const indexBuffer = webgl.createBuffer();
     webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, indexarr, webgl.STATIC_DRAW);
 
 
-    uniformTexture = webgl.getUniformLocation(webgl.program, "texture")!
-    uniformTexture1 = webgl.getUniformLocation(webgl.program, "texture1")!
+    uniformTexture = webgl.getUniformLocation(program, "texture")!
+    uniformTexture1 = webgl.getUniformLocation(program, "texture1")!
 
     texture1 = initTexture(webgl, fogUrl);
     texture0 = initTexture(webgl, imgUrl);
@@ -150,12 +143,12 @@ export default function () {
     }
     return textureHandle;
   }
-  function draw(webgl: WebGLRenderingContext) {
+  function draw(webgl: WebGLRenderingContext, program: WebGLProgram) {
     webgl.clearColor(0.3, 0.5, 0.3, 1.0);
     webgl.clear(webgl.COLOR_BUFFER_BIT | webgl.DEPTH_BUFFER_BIT);
     webgl.enable(webgl.DEPTH_TEST);
     //纹理变动
-    uniformAnim = webgl.getUniformLocation(webgl.program, "anim")!
+    uniformAnim = webgl.getUniformLocation(program, "anim")!
     count = count + 0.01;
     webgl.uniform1f(uniformAnim, count);
     webgl.activeTexture(webgl.TEXTURE0);

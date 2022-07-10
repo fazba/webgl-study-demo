@@ -4,7 +4,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router"
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    redirect: '/primary/basicShape'
+    redirect: '/primary/texture'
   },
   {
     /**初级教程 */
@@ -68,6 +68,8 @@ const routes: RouteRecordRaw[] = [
     ]
   },
 ]
+
+
 
 export default createRouter({
   history: createWebHistory(),

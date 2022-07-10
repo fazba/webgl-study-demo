@@ -3,9 +3,8 @@ import { mat4 } from "gl-matrix";
 
 export const vertexstring = `
     attribute vec3 a_position;
-    uniform  mat4  proj;
     void main(void){
-        gl_Position = proj*vec4(a_position,1.0)  ;
+        gl_Position = vec4(a_position,1.0)  ;
         gl_PointSize=60.0;
     }
     `;
@@ -24,16 +23,15 @@ export function initBuffer(webgl: WebGLRenderingContext, program: WebGLProgram) 
     0, 3, 4
   ]
   const arr = [
-    100.0, 100.0, 0, 1.0,
-    200.0, 200.0, 0, 1.0,
-    300.0, 200.0, 0, 1.0,
+    0.1, 0.1, 0, 1.0,
+    0.2, 0.2, 0, 1.0,
+    0.3, 0.2, 0, 1.0,
 
-    400.0, 600.0, 0, 1.0,
-    500.0, 700.0, 0, 1.0,
+    0.4, 0.6, 0, 1.0,
+    0.5, 0.7, 0, 1.0,
   ];
   const pointPosition = new Float32Array(arr);
   const lineBuffer = webgl.createBuffer()
-
   webgl.bindBuffer(webgl.ARRAY_BUFFER, lineBuffer);
   webgl.bufferData(webgl.ARRAY_BUFFER, pointPosition, webgl.STATIC_DRAW);
   webgl.enableVertexAttribArray(aPsotion);
@@ -43,11 +41,6 @@ export function initBuffer(webgl: WebGLRenderingContext, program: WebGLProgram) 
   const indexBuffer = webgl.createBuffer()
   webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, indexBuffer)
   webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, indexArr, webgl.STATIC_DRAW)
-  /**uniform  mat4  proj */
-  const uniformProj = webgl.getUniformLocation(program, "proj");
-  const projMat4 = mat4.create();
-  mat4.identity(projMat4);
-  webgl.uniformMatrix4fv(uniformProj, false, projMat4);
 }
 export function draw(webgl: WebGLRenderingContext) {
   webgl.clearColor(0.0, 0.0, 0.0, 1.0);

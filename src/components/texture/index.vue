@@ -3,9 +3,9 @@
 </template>
 <script setup lang="ts">
 /**单纹理 */
-// import module from './modules/singleTexture'
+import module from './modules/singleTexture'
 /**多重纹理坐标关系 */
-import module from './modules/multipleTexture'
+// import module from './modules/multipleTexture'
 
 
 module()
