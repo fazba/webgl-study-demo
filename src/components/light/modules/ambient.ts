@@ -3,21 +3,12 @@ import { mat4 } from "gl-matrix";
 export const vertexstring = /*glsl*/`
 attribute vec4 a_position;
 uniform mat4 u_formMatrix;
-attribute vec4 a_Normal;
-uniform vec3 u_PointLightPosition;
-uniform vec3 u_DiffuseLight;
 uniform vec3 u_AmbientLight;
 varying vec4 v_Color;
-uniform mat4 u_NormalMatrix;
 void main(void){
-  gl_Position = u_formMatrix * a_position;
-
-  vec3 normal = normalize(vec3(u_NormalMatrix * a_Normal));
-  vec3 lightDirection = normalize( vec3(gl_Position.xyz)-u_PointLightPosition );
-  float nDotL = max(dot(lightDirection, normal), 0.0);
-  vec3 diffuse = u_DiffuseLight * vec3(1.0,0,1.0)* nDotL;
-  vec3 ambient = u_AmbientLight * vec3(1.0,0,1.0);
-  v_Color = vec4(diffuse + ambient, 1);
+gl_Position = u_formMatrix * a_position;
+vec3 ambient = u_AmbientLight * vec3(1.0,0,1.0);
+  v_Color = vec4(ambient, 1);
 }
 `;
 export const fragmentstring = `
@@ -50,15 +41,6 @@ export function initBuffer(webgl: WebGLRenderingContext, program: WebGLProgram) 
     1.0, -1.0, -1.0, 1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0 // v4-v7-v6-v5
 
   ]
-  /**法向量 */
-  const normals = new Float32Array([
-    0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0,  // v0-v1-v2-v3 front
-    1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0,  // v0-v3-v4-v5 right
-    0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0,  // v0-v5-v6-v1 up
-    -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0,  // v1-v6-v7-v2 left
-    0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0,  // v7-v4-v3-v2 down
-    0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0   // v4-v7-v6-v5 back
-  ]);
   const index = [
     0, 1, 2, 0, 2, 3,    // front
     4, 5, 6, 4, 6, 7,    // right
@@ -75,24 +57,12 @@ export function initBuffer(webgl: WebGLRenderingContext, program: WebGLProgram) 
   webgl.bufferData(webgl.ARRAY_BUFFER, pointPosition, webgl.STATIC_DRAW);
   webgl.enableVertexAttribArray(aPsotion);
   webgl.vertexAttribPointer(aPsotion, 4, webgl.FLOAT, false, 4 * 4, 0);
-  //法向量
-  let aNormal = webgl.getAttribLocation(program, "a_Normal");
-  let normalsBuffer = webgl.createBuffer();
-  let normalsArr = new Float32Array(normals);
-  webgl.bindBuffer(webgl.ARRAY_BUFFER, normalsBuffer);
-  webgl.bufferData(webgl.ARRAY_BUFFER, normalsArr, webgl.STATIC_DRAW);
-  webgl.enableVertexAttribArray(aNormal);
-  webgl.vertexAttribPointer(aNormal, 3, webgl.FLOAT, false, 3 * 4, 0);
-  //入射光线
-  let u_DiffuseLight = webgl.getUniformLocation(program, 'u_DiffuseLight');
-  webgl.uniform3f(u_DiffuseLight, 1.0, 1.0, 1.0);
-  //入射光线方向
-  let u_LightDirection = webgl.getUniformLocation(program, 'u_LightDirection');
-  webgl.uniform3fv(u_LightDirection, [0.9, 3.0, 4.0]);
-  //环境光
-  let u_AmbientLight = webgl.getUniformLocation(program, 'u_AmbientLight');
-  webgl.uniform3f(u_AmbientLight, 0.5, 0.5, 0.5);
 
+  /**
+   * 环境光
+   */
+  const u_AmbientLight = webgl.getUniformLocation(program, 'u_AmbientLight');
+  webgl.uniform3f(u_AmbientLight, 0.5, 1, 1);
 
 
 

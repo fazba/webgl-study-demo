@@ -28,7 +28,7 @@ export const fragmentstring = `
 
 let angle = 45;
 
-export function initBuffer(webgl: WebGLRenderingContext) {
+export function initBuffer(webgl: WebGLRenderingContext, program: WebGLProgram) {
 
   //    v6----- v5
   //   /|      /|
@@ -67,14 +67,14 @@ export function initBuffer(webgl: WebGLRenderingContext) {
   ];
   //绘制点
   let pointPosition = new Float32Array(arr);
-  let aPsotion = webgl.getAttribLocation(webgl.program, "a_position");
+  let aPsotion = webgl.getAttribLocation(program, "a_position");
   let triangleBuffer = webgl.createBuffer();
   webgl.bindBuffer(webgl.ARRAY_BUFFER, triangleBuffer);
   webgl.bufferData(webgl.ARRAY_BUFFER, pointPosition, webgl.STATIC_DRAW);
   webgl.enableVertexAttribArray(aPsotion);
   webgl.vertexAttribPointer(aPsotion, 4, webgl.FLOAT, false, 4 * 4, 0);
   //法向量
-  let aNormal = webgl.getAttribLocation(webgl.program, "a_Normal");
+  let aNormal = webgl.getAttribLocation(program, "a_Normal");
   let normalsBuffer = webgl.createBuffer();
   let normalsArr = new Float32Array(normals);
   webgl.bindBuffer(webgl.ARRAY_BUFFER, normalsBuffer);
@@ -82,13 +82,13 @@ export function initBuffer(webgl: WebGLRenderingContext) {
   webgl.enableVertexAttribArray(aNormal);
   webgl.vertexAttribPointer(aNormal, 3, webgl.FLOAT, false, 3 * 4, 0);
   //入射光线
-  let u_DiffuseLight = webgl.getUniformLocation(webgl.program, 'u_DiffuseLight');
+  let u_DiffuseLight = webgl.getUniformLocation(program, 'u_DiffuseLight');
   webgl.uniform3f(u_DiffuseLight, 1.0, 1.0, 1.0);
   //入射光线方向
-  let u_LightDirection = webgl.getUniformLocation(webgl.program, 'u_LightDirection');
+  let u_LightDirection = webgl.getUniformLocation(program, 'u_LightDirection');
   webgl.uniform3fv(u_LightDirection, [0.9, 3.0, 4.0]);
   //环境光
-  let u_AmbientLight = webgl.getUniformLocation(webgl.program, 'u_AmbientLight');
+  let u_AmbientLight = webgl.getUniformLocation(program, 'u_AmbientLight');
   webgl.uniform3f(u_AmbientLight, 0.5, 0.5, 0.5);
 
 
@@ -110,7 +110,7 @@ export function initBuffer(webgl: WebGLRenderingContext) {
   const webglDiv = document.getElementById('canvas')!
   mat4.perspective(ProjMatrix, angle * Math.PI / 180, webglDiv.clientWidth / webglDiv.clientHeight, 1, 1000)    //修改可视域范围
 
-  let uniformMatrix1 = webgl.getUniformLocation(webgl.program, "u_formMatrix");
+  let uniformMatrix1 = webgl.getUniformLocation(program, "u_formMatrix");
 
   let ModelMatrix = mat4.create();
   mat4.identity(ModelMatrix);

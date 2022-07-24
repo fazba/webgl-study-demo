@@ -4,7 +4,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router"
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    redirect: '/primary/texture'
+    redirect: '/middle/light'
   },
   {
     /**初级教程 */
@@ -33,7 +33,7 @@ const routes: RouteRecordRaw[] = [
     /**中级教程 */
     path: '/middle',
     component: () => import('@/pages/middle/index.vue'),
-    redirect: '/middle/light',
+    redirect: '/middle/hierarchicalModel',
     children: [
       {
         /**平移、旋转、缩放 */
@@ -64,6 +64,11 @@ const routes: RouteRecordRaw[] = [
         /**光照 */
         path: 'light',
         component: () => import('@/components/light/index.vue'),
+      },
+      {
+        /**层次模型 */
+        path: 'hierarchicalModel',
+        component: () => import('@/components/hierarchicalModel/index.vue'),
       },
     ]
   },
